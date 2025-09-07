@@ -1,0 +1,38 @@
+{
+  "name": "cg-aos",
+  "version": "0.1.0",
+  "description": "Modern, zero-dep animate-on-scroll (AOS reimagined for 2025+).",
+  "type": "module",
+  "sideEffects": ["cg-aos.css"],
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    }
+  },
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "files": ["index.js", "index.d.ts", "cg-aos.css", "README.md", "LICENSE"],
+  "keywords": [
+    "aos",
+    "animate-on-scroll",
+    "scroll",
+    "animation",
+    "intersectionobserver",
+    "reveal",
+    "frontend",
+    "codegenie"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codegenie-be/cg-aos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/codegenie-be/cg-aos/issues"
+  },
+  "homepage": "https://github.com/codegenie-be/cg-aos#readme",
+  "author": "CODEGENIE <info@codegenie.be>",
+  "license": "MIT",
+  "engines": { "node": ">=18" }
+}
