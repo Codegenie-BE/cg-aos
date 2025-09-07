@@ -3,7 +3,7 @@ const hasWindow = typeof window !== 'undefined';
 const hasDoc = typeof document !== 'undefined';
 
 const prefersReduced = () =>
-  hasWindow && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  (hasWindow && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) ?? false;
 
 const setStyle = (el, s) => { for (const k in s) el.style[k] = s[k]; };
 
@@ -59,14 +59,10 @@ function prep(el, onceDefault){
 
 export const cgAOS = {
   init(opts = {}){
-    // SSR no-op
-    if (!hasDoc || !hasWindow) {
-      return { destroy(){}, observe(){}, unobserve(){} };
-    }
+    if (!hasDoc || !hasWindow) return { destroy(){}, observe(){}, unobserve(){} };
 
     const sel = opts.selector ?? '[data-cg]';
 
-    // Reduced motion
     if (prefersReduced() && opts.reducedMotion !== 'none') {
       document.querySelectorAll(sel).forEach(el=>{
         if (opts.reducedMotion === 'skip') el.removeAttribute('data-cg');
@@ -76,7 +72,6 @@ export const cgAOS = {
       return { destroy(){}, observe(){}, unobserve(){} };
     }
 
-    // Fallback when IntersectionObserver is missing
     if (typeof IntersectionObserver === 'undefined') {
       document.querySelectorAll(sel).forEach(el=>{
         const t = el.dataset.cg || 'fade';
@@ -101,10 +96,8 @@ export const cgAOS = {
       }
     }, { root: opts.root ?? null, rootMargin: opts.rootMargin ?? '0px 0px -10% 0px', threshold: opts.threshold ?? 0.1 });
 
-    // Initial attach
     document.querySelectorAll(sel).forEach(el=>{ prep(el, opts.once ?? true); io.observe(el); });
 
-    // Auto observe dynamic nodes (can be disabled with autoObserve:false)
     let mo = null;
     if (opts.autoObserve !== false) {
       mo = new MutationObserver(muts=>{

@@ -34,5 +34,6 @@
   "homepage": "https://github.com/codegenie-be/cg-aos#readme",
   "author": "CODEGENIE <info@codegenie.be>",
   "license": "MIT",
+  "funding": [{ "type": "github", "url": "https://github.com/sponsors/Codegenie-BE" }],
   "engines": { "node": ">=18" }
 }

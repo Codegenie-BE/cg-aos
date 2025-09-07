@@ -1,2 +1,4 @@
 [data-cg]{opacity:0}
 .cg-in{opacity:1}
+:where([data-cg]){opacity:0}
+:where(.cg-in){opacity:1}

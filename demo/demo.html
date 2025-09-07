@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cg-aos Demo</title>
+  <link rel="stylesheet" href="../cg-aos.css" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    section {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      background: #f9f9f9;
+      border-bottom: 1px solid #ddd;
+    }
+    section:nth-child(even) {
+      background: #e6f0ff;
+    }
+  </style>
+</head>
+<body>
+  <section>
+    <div data-cg="fade-up" data-cg-delay="3000">Fade Up</div>
+  </section>
+  <section>
+    <div data-cg="fade-down" data-cg-delay="300">Fade Down with delay</div>
+  </section>
+  <section>
+    <div data-cg="fade-left" data-cg-duration="800">Fade Left (800ms)</div>
+  </section>
+  <section>
+    <div data-cg="fade-right">Fade Right</div>
+  </section>
+  <section>
+    <div data-cg="zoom-in" data-cg-stagger="200">
+      <p>Zoom In</p>
+      <p>With staggered children</p>
+    </div>
+  </section>
+
+  <script type="module">
+    import { cgAOS } from '../index.js';
+    cgAOS.init({ once: true });
+  </script>
+</body>
+</html>
