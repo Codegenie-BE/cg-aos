@@ -1,6 +1,6 @@
 {
   "name": "cg-aos",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Modern, zero-dep animate-on-scroll (AOS reimagined for 2025+).",
   "type": "module",
   "sideEffects": [
