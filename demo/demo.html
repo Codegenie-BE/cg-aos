@@ -2,53 +2,323 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cg-aos Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>cg-aos — Full Options Demo (IIFE / non-module)</title>
   <link rel="stylesheet" href="../cg-aos.css" />
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
+    :root { --pad: 20px; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; margin: 0; line-height: 1.6; }
+    header {
+      position: sticky; top: 0; z-index: 10; background: #111; color: #fff;
+      padding: 8px 12px; display: grid; gap: 8px; border-bottom: 1px solid #222;
     }
-    section {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      background: #f9f9f9;
-      border-bottom: 1px solid #ddd;
+    header .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    header label { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+    header input[type="text"], header select, header input[type="number"] { padding: 4px 6px; }
+    main section {
+      min-height: 80vh; display: grid; place-items: center;
+      padding: calc(var(--pad) * 2) var(--pad);
+      border-bottom: 1px solid #eee; background: #f9fafb;
     }
-    section:nth-child(even) {
-      background: #e6f0ff;
+    main section:nth-child(even) { background: #eef6ff; }
+    .card {
+      background: #fff; border: 1px solid #ddd; border-radius: 12px;
+      padding: 24px; max-width: 900px; width: min(90vw, 900px);
+      box-shadow: 0 6px 18px rgba(0,0,0,.06);
     }
+    .grid { display: grid; gap: 16px; }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .pill { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; background:#eee; }
+    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    code { background:#f3f3f3; padding:2px 6px; border-radius:6px; }
+    pre { background:#0b1020; color:#c8d3f5; padding:12px; border-radius:8px; overflow:auto; }
+    button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+    button.primary { background:#216EF2; color:#fff; border-color:#216EF2; }
+    .log {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background:#0b1020; color:#9fd3ff; padding:12px; border-radius:8px; height:180px; overflow:auto; font-size:12px;
+    }
+    .muted { color:#666; font-size: 14px; }
+    .box {
+      display:grid; place-items:center;
+      min-height:140px; border:1px dashed #ccc; border-radius:10px; background:#fafafa;
+      padding:16px; text-align:center;
+    }
+    /* Visuele hulp */
+    .marker { background: #fef9c3; border: 1px solid #fde68a; }
   </style>
 </head>
 <body>
-  <section>
-    <div data-cg="fade-up" data-cg-delay="3000">Fade Up</div>
-  </section>
-  <section>
-    <div data-cg="fade-down" data-cg-delay="300">Fade Down with delay</div>
-  </section>
-  <section>
-    <div data-cg="fade-left" data-cg-duration="800">Fade Left (800ms)</div>
-  </section>
-  <section>
-    <div data-cg="fade-right">Fade Right</div>
-  </section>
-  <section>
-    <div data-cg="zoom-in" data-cg-stagger="200">
-      <p>Zoom In</p>
-      <p>With staggered children</p>
+  <header>
+    <div class="row">
+      <strong>cg-aos Demo Controls</strong>
+      <span class="pill">IIFE build</span>
+      <span class="pill">IntersectionObserver</span>
+      <span class="pill">Events</span>
     </div>
-  </section>
+    <div class="row">
+      <label>once
+        <select id="ctl-once">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+      </label>
+      <label>reducedMotion
+        <select id="ctl-rm">
+          <option value="none">none (forceer animatie)</option>
+          <option value="instant">instant (geen transition)</option>
+          <option value="skip">skip (helemaal overslaan)</option>
+        </select>
+      </label>
+      <label>threshold
+        <input id="ctl-threshold" type="number" step="0.05" min="0" max="1" value="0.15" style="width:80px"/>
+      </label>
+      <label>rootMargin
+        <input id="ctl-rootMargin" type="text" value="0px 0px -10% 0px" style="width:160px"/>
+      </label>
+      <label>autoObserve
+        <select id="ctl-autoObserve">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+      </label>
+      <button id="ctl-reinit" class="primary">Re-init cgAOS</button>
+      <span class="muted">Tip: wijzig opties en klik Re-init</span>
+    </div>
+  </header>
 
-  <script type="module">
-    import { cgAOS } from '../index.js';
-    cgAOS.init({ once: true });
+  <main>
+    <!-- Effecten -->
+    <section>
+      <div class="card grid cols-2">
+        <div class="grid">
+          <h3>Effecten (standaard)</h3>
+          <div class="box marker" data-cg="fade">fade</div>
+          <div class="box" data-cg="fade-up">fade-up</div>
+          <div class="box" data-cg="fade-down">fade-down</div>
+          <div class="box" data-cg="fade-left">fade-left</div>
+          <div class="box" data-cg="fade-right">fade-right</div>
+          <div class="box" data-cg="zoom-in">zoom-in</div>
+          <div class="box" data-cg="zoom-out">zoom-out</div>
+        </div>
+        <div>
+          <p>Deze blokken gebruiken de standaard <code>duration=500</code> en <code>easing=cubic-bezier(.2,.7,.2,1)</code>.</p>
+          <pre><code>&lt;div data-cg="fade-up"&gt;...&lt;/div&gt;</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Duration / Delay / Easing -->
+    <section>
+      <div class="card grid cols-3">
+        <div>
+          <h3>Duration</h3>
+          <div class="box" data-cg="fade-up" data-cg-duration="200">200ms</div>
+          <div class="box" data-cg="fade-up" data-cg-duration="800">800ms</div>
+          <div class="box" data-cg="fade-up" data-cg-duration="2000">2000ms</div>
+        </div>
+        <div>
+          <h3>Delay</h3>
+          <div class="box" data-cg="fade-down" data-cg-delay="0">0ms</div>
+          <div class="box" data-cg="fade-down" data-cg-delay="300">300ms</div>
+          <div class="box" data-cg="fade-down" data-cg-delay="900">900ms</div>
+        </div>
+        <div>
+          <h3>Easing</h3>
+          <div class="box" data-cg="fade-left" data-cg-easing="ease-out">ease-out</div>
+          <div class="box" data-cg="fade-left" data-cg-easing="linear">linear</div>
+          <div class="box" data-cg="fade-left" data-cg-easing="cubic-bezier(.25,.8,.25,1)">custom bezier</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stagger -->
+    <section>
+      <div class="card">
+        <h3>Stagger (op directe kinderen)</h3>
+        <p>Gebruik <code>data-cg-stagger="250"</code> op de container; elk direct kind krijgt extra <code>delay</code>.</p>
+        <div class="row" data-cg="zoom-in" data-cg-stagger="250">
+          <div class="box" style="min-width:160px;">1</div>
+          <div class="box" style="min-width:160px;">2</div>
+          <div class="box" style="min-width:160px;">3</div>
+          <div class="box" style="min-width:160px;">4</div>
+        </div>
+        <pre><code>&lt;div data-cg="zoom-in" data-cg-stagger="250"&gt;
+  &lt;div&gt;Child 1&lt;/div&gt; &lt;div&gt;Child 2&lt;/div&gt; ...
+&lt;/div&gt;</code></pre>
+      </div>
+    </section>
+
+    <!-- Once / Repeat -->
+    <section>
+      <div class="card grid cols-2">
+        <div>
+          <h3>Globaal <code>once</code> (via init)</h3>
+          <p>Stel bovenaan in met het dropdown-menu en klik <b>Re-init</b>.</p>
+          <div class="box" data-cg="fade-right">Valt terug op globale <code>once</code></div>
+        </div>
+        <div>
+          <h3>Per element <code>data-cg-once</code></h3>
+          <div class="box" data-cg="fade-right" data-cg-once>Per-element once = true</div>
+          <div class="box" data-cg="fade-right" data-cg-once="false">Per-element once = false (repeat)</div>
+          <p class="muted">Per-element overschrijft de globale instelling.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reduced Motion -->
+    <section>
+      <div class="card">
+        <h3>Reduced Motion modi</h3>
+        <ul>
+          <li><code>none</code> — forceer animaties, negeer OS-instelling.</li>
+          <li><code>instant</code> — geen transition (eindstaat direct).</li>
+          <li><code>skip</code> — helemaal niets doen (geen init-stijlen, geen show).</li>
+        </ul>
+        <p>Gebruik de dropdown in de header en klik <b>Re-init</b> om live te testen.</p>
+        <div class="row">
+          <div class="box" data-cg="fade-up">Testblok A</div>
+          <div class="box" data-cg="fade-up">Testblok B</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Threshold & rootMargin -->
+    <section>
+      <div class="card">
+        <h3>Threshold &amp; rootMargin</h3>
+        <p>
+          Deze opties werken op <b>init</b>-niveau (niet per element) en bepalen wanneer de intersectie triggert.
+          Pas ze aan bovenaan en klik <b>Re-init</b>.
+        </p>
+        <div class="box" data-cg="fade">Scroll om de trigger te voelen (hoger/lager threshold)</div>
+      </div>
+    </section>
+
+    <!-- Events -->
+    <section>
+      <div class="card grid cols-2">
+        <div>
+          <h3>Events: <code>cg:enter</code> &amp; <code>cg:exit</code></h3>
+          <div id="evt-target" class="box" data-cg="zoom-in" data-cg-duration="800">
+            Beweeg in/uit viewport om events te loggen
+          </div>
+          <p class="muted">Luisteraars worden in de scriptsectie toegevoegd.</p>
+        </div>
+        <div>
+          <h4>Log</h4>
+          <div id="evt-log" class="log"></div>
+          <div class="row">
+            <button id="clear-log">Clear log</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Auto-Observe & Programmatic observe/unobserve -->
+    <section>
+      <div class="card">
+        <h3>Auto-Observe (MutationObserver) &amp; Programmatic API</h3>
+        <p>
+          Als <code>autoObserve</code> aan staat, worden nodes met <code>data-cg</code> die later toegevoegd worden automatisch geobserveerd.
+          Hieronder voegen we dynamisch een blok toe. Ook kun je expliciet <code>observe(el)</code>/<code>unobserve(el)</code> aanroepen.
+        </p>
+        <div class="row">
+          <button id="btn-add" class="primary">Voeg dynamisch element toe</button>
+          <button id="btn-observe">Observe laatste</button>
+          <button id="btn-unobserve">Unobserve laatste</button>
+        </div>
+        <div id="dyn-wrap" class="row" style="margin-top:16px; flex-wrap:wrap;"></div>
+      </div>
+    </section>
+
+    <!-- Footer uitleg -->
+    <section>
+      <div class="card">
+        <h3>Samenvatting</h3>
+        <ul>
+          <li>Effecten: <code>fade</code>, <code>fade-up</code>, <code>fade-down</code>, <code>fade-left</code>, <code>fade-right</code>, <code>zoom-in</code>, <code>zoom-out</code></li>
+          <li>Attribuut-API: <code>data-cg-duration</code>, <code>data-cg-delay</code>, <code>data-cg-easing</code>, <code>data-cg-once</code>, <code>data-cg-stagger</code></li>
+          <li>Init-opties: <code>once</code>, <code>reducedMotion</code>, <code>threshold</code>, <code>rootMargin</code>, <code>autoObserve</code>, <code>selector</code></li>
+          <li>Events: <code>cg:enter</code> en <code>cg:exit</code> (bubblen)</li>
+          <li>API: <code>.destroy()</code>, <code>.observe(el)</code>, <code>.unobserve(el)</code></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- IIFE (global) build from dist/ produced by tsup: index.global.js -->
+  <script src="../dist/index.global.js"></script>
+  <script>
+    // Huidige instance
+    let AOS = null;
+
+    function reinitFromControls() {
+      // Lees UI
+      const once = document.getElementById('ctl-once').value === 'true';
+      const reducedMotion = document.getElementById('ctl-rm').value;
+      const threshold = parseFloat(document.getElementById('ctl-threshold').value);
+      const rootMargin = document.getElementById('ctl-rootMargin').value;
+      const autoObserve = document.getElementById('ctl-autoObserve').value === 'true';
+
+      // Vernieuw instance
+      AOS?.destroy?.();
+      AOS = cgAOS.init({
+        once,
+        reducedMotion,
+        threshold: isFinite(threshold) ? threshold : 0.15,
+        rootMargin,
+        autoObserve
+      });
+    }
+
+    // Init bij load
+    reinitFromControls();
+
+    // Header knoppen
+    document.getElementById('ctl-reinit').addEventListener('click', reinitFromControls);
+
+    // Events demo
+    const evtTarget = document.getElementById('evt-target');
+    const logBox = document.getElementById('evt-log');
+    const log = (msg) => {
+      const ts = new Date().toLocaleTimeString();
+      logBox.textContent += `[${ts}] ${msg}\n`;
+      logBox.scrollTop = logBox.scrollHeight;
+    };
+    evtTarget.addEventListener('cg:enter', () => log('cg:enter fired'));
+    evtTarget.addEventListener('cg:exit',  () => log('cg:exit fired'));
+    document.getElementById('clear-log').addEventListener('click', () => logBox.textContent = '');
+
+    // Dynamische toevoegingen + observe/unobserve
+    const dynWrap = document.getElementById('dyn-wrap');
+    let lastDynamic = null;
+
+    document.getElementById('btn-add').addEventListener('click', () => {
+      const box = document.createElement('div');
+      box.className = 'box';
+      box.dataset.cg = (Math.random() > .5) ? 'fade-up' : 'zoom-in';
+      box.setAttribute('data-cg-duration', String(300 + Math.floor(Math.random()*1200)));
+      box.style.minWidth = '200px';
+      box.style.minHeight = '120px';
+      box.innerHTML = 'Dynamisch';
+      dynWrap.appendChild(box);
+      lastDynamic = box;
+    });
+
+    document.getElementById('btn-observe').addEventListener('click', () => {
+      if (lastDynamic && AOS?.observe) {
+        AOS.observe(lastDynamic);
+      }
+    });
+
+    document.getElementById('btn-unobserve').addEventListener('click', () => {
+      if (lastDynamic && AOS?.unobserve) {
+        AOS.unobserve(lastDynamic);
+      }
+    });
   </script>
 </body>
 </html>

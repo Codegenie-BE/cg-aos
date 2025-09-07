@@ -49,12 +49,20 @@ function prep(el, onceDefault){
   });
   if (delay) el.style.transitionDelay = `${delay}ms`;
 
-  const stagger = num(el.dataset.cgStagger,0);
+  const stagger = num(el.dataset.cgStagger, 0);
   if (stagger) {
-    el.querySelectorAll(':scope > *').forEach((c,i)=>{
-      c.style.transitionDelay = `${num(c.dataset?.cgDelay,delay)+i*stagger}ms`;
+    el.querySelectorAll(':scope > *').forEach((c, i) => {
+      // geef kinderen hun eigen transition & initial styles
+      setStyle(c, {
+        willChange: 'opacity, transform',
+        transition: `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}`,
+        ...(initial[type] ?? { opacity: '0' })
+      });
+      const childDelay = num(c.dataset?.cgDelay, delay) + i * stagger;
+      c.style.transitionDelay = `${childDelay}ms`;
     });
   }
+
 }
 
 export const cgAOS = {
@@ -80,21 +88,45 @@ export const cgAOS = {
       return { destroy(){}, observe(){}, unobserve(){} };
     }
 
-    const io = new IntersectionObserver((entries)=>{
-      for (const e of entries) {
-        const el = e.target; const t = el.dataset.cg || 'fade';
-        if (e.isIntersecting) {
-          setStyle(el, fin[t] ?? {opacity:'1',transform:'none'});
-          el.classList.add('cg-in');
-          el.dispatchEvent(new CustomEvent('cg:enter'));
-          if (el.__cgOnce__) io.unobserve(el);
-        } else if (el.__cgRepeat__) {
-          setStyle(el, initial[t] ?? {opacity:'0'});
-          el.classList.remove('cg-in');
-          el.dispatchEvent(new CustomEvent('cg:exit'));
-        }
+const io = new IntersectionObserver((entries)=>{
+  for (const e of entries) {
+    const el = e.target; 
+    const t  = el.dataset.cg || 'fade';
+    const hasStagger = !!num(el.dataset.cgStagger, 0);
+
+if (e.isIntersecting) {
+  if (hasStagger) {
+    // 1) Maak parent direct zichtbaar, anders blijven alle kinderen verborgen
+    setStyle(el, { opacity: '1', transform: 'none' }); // evt. ook: el.style.transitionDelay = '';
+
+    // 2) Laat de kinderen animeren naar hun eindstijlen (stagger + rAF)
+    requestAnimationFrame(() => {
+      el.querySelectorAll(':scope > *').forEach(c => {
+        setStyle(c, fin[t] ?? { opacity:'1', transform:'none' });
+      });
+    });
+  } else {
+    requestAnimationFrame(() => {
+      setStyle(el, fin[t] ?? { opacity:'1', transform:'none' });
+    });
+  }
+  el.classList.add('cg-in');
+  el.dispatchEvent(new CustomEvent('cg:enter', { bubbles: true }));
+  if (el.__cgOnce__) io.unobserve(el);
+} else if (el.__cgRepeat__) {
+      if (hasStagger) {
+        el.querySelectorAll(':scope > *').forEach(c => {
+          setStyle(c, initial[t] ?? { opacity:'0', transform:'none' });
+        });
+      } else {
+        setStyle(el, initial[t] ?? { opacity:'0', transform:'none' });
       }
-    }, { root: opts.root ?? null, rootMargin: opts.rootMargin ?? '0px 0px -10% 0px', threshold: opts.threshold ?? 0.1 });
+      el.classList.remove('cg-in');
+      el.dispatchEvent(new CustomEvent('cg:exit', { bubbles: true }));
+    }
+  }
+}, { root: opts.root ?? null, rootMargin: opts.rootMargin ?? '0px 0px -10% 0px', threshold: opts.threshold ?? 0.1 });
+
 
     document.querySelectorAll(sel).forEach(el=>{ prep(el, opts.once ?? true); io.observe(el); });
 
@@ -117,3 +149,5 @@ export const cgAOS = {
     };
   }
 };
+
+export default cgAOS;

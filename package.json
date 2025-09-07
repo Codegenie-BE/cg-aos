@@ -3,7 +3,13 @@
   "version": "0.1.0",
   "description": "Modern, zero-dep animate-on-scroll (AOS reimagined for 2025+).",
   "type": "module",
-  "sideEffects": ["cg-aos.css"],
+  "sideEffects": [
+    "cg-aos.css"
+  ],
+"scripts": {
+  "build": "tsup",
+  "dev": "tsup --watch"
+},
   "exports": {
     ".": {
       "import": "./index.js",
@@ -13,7 +19,13 @@
   "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
-  "files": ["index.js", "index.d.ts", "cg-aos.css", "README.md", "LICENSE"],
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "cg-aos.css",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "aos",
     "animate-on-scroll",
@@ -34,6 +46,17 @@
   "homepage": "https://github.com/codegenie-be/cg-aos#readme",
   "author": "CODEGENIE <info@codegenie.be>",
   "license": "MIT",
-  "funding": [{ "type": "github", "url": "https://github.com/sponsors/Codegenie-BE" }],
-  "engines": { "node": ">=18" }
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/Codegenie-BE"
+    }
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
+  }
 }
